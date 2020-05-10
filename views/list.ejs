@@ -11,7 +11,10 @@
 <body>
 
   <div class="box" id="heading">
+    <h1><%= kindOfList %></h1>
     <h1><%= kindOfDay %></h1>
+    
+
   </div>
 
   <div class="box">
@@ -22,9 +25,9 @@
     </div>
     <% }); %>
 
-    <form class="item" action="/" method="post">
+    <form class="item" action= "<%= postAction %> "  method="post">
       <input name="newItem" type="text" placeholder="Add New To Do" autocomplete="off"/>
-      <button type="submit">+</button>
+      <button type="submit" name="kindOfList" value="<%= kindOfList %>">+</button>
     </form>
 
   </div>
