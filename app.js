@@ -13,8 +13,8 @@ app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
 // Global variable declaration:
-var day = "";
-var items = ["Buy Food", "Cook Food", "Eat Food"];
+let day = "";
+let items = ["Buy Food", "Cook Food", "Eat Food"];
 
 
 
