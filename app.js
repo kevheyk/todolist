@@ -3,6 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 let ejs = require("ejs");
 
+// local module
+const date = require(__dirname + "/date.js");
+
+console.log(date)
+
 // Ser environment
 const app = express();
 app.set("view engine", "ejs");
@@ -13,26 +18,19 @@ app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
 // Global variable declaration:
-let day = "";
-let dailyItems = ["Buy Food", "Cook Food", "Eat Food"];
-let workItems = [];
+
+// In JS, CONST allows manipulation INSIDE variable, not re-pointing
+const dailyItems = ["Buy Food", "Cook Food", "Eat Food"];
+const workItems = [];
 
 
-
-// Use Date.toLocaleString fomatter.
-day = new Date().toLocaleString("en-US", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-});
-console.log(day);
 
 // Home Route Logic
 app.get("/", function (req, res) {
   // Date class use system date and default input.
   res.render("list", {
     kindOfList: "Daily List",
-    kindOfDay: day,
+    kindOfDay: date.getDate(),
     items:dailyItems,
     // Optional: Use postAction to differentiate which post to render
     postAction: "/"
@@ -45,7 +43,7 @@ app.get("/work", function (req, res) {
   
   res.render("list", {
     kindOfList: "Work List",
-    kindOfDay: day,
+    kindOfDay: date.getDate(),
     items:workItems,
     // Optional: Set this one to "/work" to activate postAction directing.
     postAction: "/"
