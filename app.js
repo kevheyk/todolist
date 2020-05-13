@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 let ejs = require("ejs");
+const mongoose = require("mongoose");
 
 // local module
 const date = require(__dirname + "/date.js");
@@ -11,6 +12,29 @@ console.log(date)
 // Ser environment
 const app = express();
 app.set("view engine", "ejs");
+
+// Connect to DB
+mongoose.connect("mongodb://localhost:27017/todolistDB",{
+   useNewUrlParser: true ,
+   useUnifiedTopology: true
+  }, function(err){
+    if (err){
+      console.log(err);
+    } else {
+      console.log("MongoDB Connected Successfully");
+    }
+  });
+
+// Set Item Schema
+const itemSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required:true
+  }
+});
+// Create collection
+const Item = mongoose.model("Item", itemSchema);
+
 // Use _dirname if you want / to be static
 app.use(express.static("public/"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,6 +45,23 @@ app.listen(3000, function () {
 
 // In JS, CONST allows manipulation INSIDE variable, not re-pointing
 const dailyItems = ["Buy Food", "Cook Food", "Eat Food"];
+
+// Create sample items
+
+const item1 = new Item ({
+  name: "Buy Food"
+});
+
+const item2 = new Item ({
+  name: "Cook Food"
+});
+
+const item3 = new Item ({
+  name: "Eat Food"
+});
+
+dailyItem = [item1.name, item2.name, item3.name]
+
 const workItems = [];
 
 
