@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 let ejs = require("ejs");
 const mongoose = require("mongoose");
+const _ = require("lodash");
 
 // local module
 const date = require(__dirname + "/date.js");
@@ -34,7 +35,7 @@ const itemSchema = new mongoose.Schema({
   category:{
     type: String,
     required:true,
-    enum:['Daily','Work']
+    enum:['Daily','Work','Secret']
   },
   status:{
     type: String,
@@ -57,20 +58,22 @@ app.listen(3000, function () {
 
 
 // Home Route Logic
-app.get("/", function (req, res) {
+app.get("/:kindList-List", function (req, res) {
+  
+  const route_params = _.startCase(req.params.kindList);
   // Read data from DB
-  Item.find({},{},function(err, items){
+  Item.find({category:route_params},{},function(err, items){
     if(err){
       console.log(err);
     } else{
       console.log("Return items: " + items);
       
       res.render("list", {
-        kindOfList: "Daily List",
+        kindOfList: route_params + " List",
         kindOfDay: date.getDate(),
         items:items,
         // Optional: Use postAction to differentiate which post to render
-        postAction: "/"
+        postAction: "/"+route_params+"-List"
         
       });
     }
@@ -79,34 +82,18 @@ app.get("/", function (req, res) {
 
 });
 
-// Receive data from Daily List
-app.get("/work", function (req, res) {
-  
-  res.render("list", {
-    kindOfList: "Work List",
-    kindOfDay: date.getDate(),
-    items:workItems,
-    // Optional: Set this one to "/work" to activate postAction directing.
-    postAction: "/"
-  });
-  
-});
-
 
 // Receive data from Daily List
-app.post("/", function (req, res) {
-
+app.post("/:kindOfList-List", function (req, res) {
+  const route_params = _.startCase(req.params.kindOfList);
   console.log(req.body);
   // Use button value to direct which list to GET
-  switch(req.body.kindOfList){
-    case "Daily List":
-      // dailyItems.push(req.body.newItem);
 
       Item.findOneAndUpdate(
         {name:req.body.newItem},
         new Item({
           name:req.body.newItem,
-          category:"Daily",
+          category:route_params,
           status:"Unchecked"
         }),
         {upsert:true,
@@ -114,29 +101,13 @@ app.post("/", function (req, res) {
         function(err){
           if(err){
             console.log(err);
-            res.redirect("/");
-          } else{
-            res.redirect("/");
-          }
+          } 
+          res.redirect("back");
+          
         })
-      break;
-    case "Work List":
-      workItems.push(req.body.newItem);
-      res.redirect("/work")
-      break;
-    default:
-      console.log("What? This new item is from somewhere else!"+req.body.kindOfList+".")
-  }
+  
     
   
-});
-// Optional. Not working as I have set postAction always "/".
-// Receive data from Work List
-app.post("/work", function (req, res) {
-  console.log(req.body);
-  workItems.push(req.body.newItem);
-  res.redirect("/work");
-
 });
 
 
@@ -147,9 +118,20 @@ app.get("/clear", function (req, res) {
     if(err){
       console.log(err);
     } else {
-      console.log("Success Clear All Data");
-      res.redirect("/");
+      res.send("Success Clear Checked Data");
     }
+  });
+});
+
+app.get("/clear-all", function (req, res) {
+
+  Item.deleteMany({},function(err){
+    if(err){
+      console.log(err);
+    } else {
+      console.log("Success Clear All Data");
+    }
+      res.send("Success Clear All Data");
   });
 });
 
