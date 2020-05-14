@@ -30,6 +30,16 @@ const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required:true
+  },
+  category:{
+    type: String,
+    required:true,
+    enum:['Daily','Work']
+  },
+  status:{
+    type: String,
+    required:true,
+    enum:['Checked', 'Unchecked']
   }
 });
 // Create collection
@@ -44,39 +54,29 @@ app.listen(3000, function () {
 // Global variable declaration:
 
 // In JS, CONST allows manipulation INSIDE variable, not re-pointing
-const dailyItems = ["Buy Food", "Cook Food", "Eat Food"];
-
-// Create sample items
-
-const item1 = new Item ({
-  name: "Buy Food"
-});
-
-const item2 = new Item ({
-  name: "Cook Food"
-});
-
-const item3 = new Item ({
-  name: "Eat Food"
-});
-
-dailyItem = [item1.name, item2.name, item3.name]
-
-const workItems = [];
-
 
 
 // Home Route Logic
 app.get("/", function (req, res) {
-  // Date class use system date and default input.
-  res.render("list", {
-    kindOfList: "Daily List",
-    kindOfDay: date.getDate(),
-    items:dailyItems,
-    // Optional: Use postAction to differentiate which post to render
-    postAction: "/"
-    
-  });
+  // Read data from DB
+  Item.find({},{},function(err, items){
+    if(err){
+      console.log(err);
+    } else{
+      console.log("Return items: " + items);
+      
+      res.render("list", {
+        kindOfList: "Daily List",
+        kindOfDay: date.getDate(),
+        items:items,
+        // Optional: Use postAction to differentiate which post to render
+        postAction: "/"
+        
+      });
+    }
+
+  })
+
 });
 
 // Receive data from Daily List
@@ -95,11 +95,30 @@ app.get("/work", function (req, res) {
 
 // Receive data from Daily List
 app.post("/", function (req, res) {
+
+  console.log(req.body);
   // Use button value to direct which list to GET
   switch(req.body.kindOfList){
     case "Daily List":
-      dailyItems.push(req.body.newItem);
-      res.redirect("/");
+      // dailyItems.push(req.body.newItem);
+
+      Item.findOneAndUpdate(
+        {name:req.body.newItem},
+        new Item({
+          name:req.body.newItem,
+          category:"Daily",
+          status:"Unchecked"
+        }),
+        {upsert:true,
+        runValidators: true},
+        function(err){
+          if(err){
+            console.log(err);
+            res.redirect("/");
+          } else{
+            res.redirect("/");
+          }
+        })
       break;
     case "Work List":
       workItems.push(req.body.newItem);
@@ -120,3 +139,32 @@ app.post("/work", function (req, res) {
 
 });
 
+
+// Clear All Data
+app.get("/clear", function (req, res) {
+
+  Item.deleteMany({status:"Checked"},function(err){
+    if(err){
+      console.log(err);
+    } else {
+      console.log("Success Clear All Data");
+      res.redirect("/");
+    }
+  });
+});
+
+
+app.post("/check", (req, res)=>{
+  for (const [key, value] of Object.entries(req.body)){
+
+    Item.updateOne({name:key},{$set:{status:value}},(err,doc)=>{
+      // Item.findOneAndUpdate({name:key},{$set:{status:value}},(err,doc)=>{
+      if (err){
+        console.log(err);
+      } 
+      res.redirect("back");
+      console.log(req.body);
+    })
+    
+  }
+});

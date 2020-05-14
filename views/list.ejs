@@ -1,25 +1,60 @@
-<%- include("header")  %> 
-<body>
+<%- include("header") %>
 
+<body>
   <div class="box" id="heading">
     <h1><%= kindOfList %></h1>
     <h1><%= kindOfDay %></h1>
-    
-
   </div>
 
   <div class="box">
     <% items.forEach(function(item, index){ %>
-    <div class="item">
-      <input type="checkbox" />
-      <p><%= item %></p>
-    </div>
+    <form action="/check" method="post">
+      <div class="item">
+        <!-- Use hidden checkbox to submmit status -->
+        <input type="hidden" name = "<%= item.name %>">
+        <!-- Use visable checkbox to change the value of hidden checkbox -->
+        <input
+          type="checkbox"
+      onchange="checkAndSend(this)"
+      <% if (item.status==="Checked") { %>
+        checked
+       <% } %>
+   
+        />
+        <p><%= item.name %></p>
+      </div>
+    </form>
     <% }); %>
 
-    <form class="item" action= "<%= postAction %> "  method="post">
-      <input name="newItem" type="text" placeholder="Add New To Do" autocomplete="off"/>
-      <button type="submit" name="kindOfList" value="<%= kindOfList %>">+</button>
+    <form id="myForm" class="item" action="<%= postAction %> " method="post">
+      <input
+        name="newItem"
+        type="text"
+        placeholder="Add New To Do"
+        autocomplete="off"
+      />
+      <button class="add-button" type="submit" name="kindOfList" value="<%= kindOfList %>">
+        +
+      </button>
     </form>
-
+    <form action="/clear">
+  <button type="submit">-</button>
+    </form>
   </div>
-  <%- include("footer")  %> 
+  <%- include("footer") %>
+
+  <script>
+
+    function checkAndSend(sel){
+      if(sel.checked){
+        sel.previousElementSibling.value = "Checked";
+      } else{
+        sel.previousElementSibling.value = "Unchecked";
+      }
+      sel.form.submit()
+    }
+  </script>
+
+
+</body>
+
