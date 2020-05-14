@@ -49,7 +49,8 @@ const Item = mongoose.model("Item", itemSchema);
 // Use _dirname if you want / to be static
 app.use(express.static("public/"));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.listen(3000, function () {
+// Local and Heroku
+app.listen(process.env.PORT || 3000, function () {
   console.log("Server started on port 3000");
 });
 // Global variable declaration:
