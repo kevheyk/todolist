@@ -1,8 +1,0 @@
-<<<<<<< HEAD
-See if I will be deleted.
-
-Add some text.
-See.
-=======
-See.
->>>>>>> test-branch
