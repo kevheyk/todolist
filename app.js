@@ -15,7 +15,7 @@ const app = express();
 app.set("view engine", "ejs");
 
 // Connect to DB
-mongoose.connect("mongodb://localhost:27017/todolistDB",{
+mongoose.connect("mongodb+srv://admin-kevin:Api=123456@cluster0-jhuob.mongodb.net/todolistDB",{
    useNewUrlParser: true ,
    useUnifiedTopology: true
   }, function(err){
