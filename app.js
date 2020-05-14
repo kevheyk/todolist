@@ -56,9 +56,14 @@ app.listen(process.env.PORT || 3000, function () {
 // Global variable declaration:
 
 // In JS, CONST allows manipulation INSIDE variable, not re-pointing
-
-
 // Home Route Logic
+
+app.get("/", function (req, res) {
+  res.redirect("work-list");
+})
+
+
+// Free Route Logic
 app.get("/:kindList-List", function (req, res) {
   
   const route_params = _.startCase(req.params.kindList);
